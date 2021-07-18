@@ -72,8 +72,8 @@
     currentScene,
     currentPreviewScene,
     isFullScreen,
-    isStudioMode,
-    isSceneOnTop,
+    isStudioMode = true,
+    isSceneOnTop = true,
     wakeLock = false;
   let scenes = [];
   let host,
@@ -421,15 +421,15 @@
               <!-- svelte-ignore a11y-missing-attribute -->
               {#if currentScene == sc.name}
                 <a class="tile is-child is-primary notification">
-                  <p class="title has-text-centered is-size-6-mobile">{sc.name}</p>
+                  <p class="has-text-centered is-size-6-mobile">{sc.name}</p>
                 </a>
               {:else if currentPreviewScene == sc.name}
                 <a on:click={setScene} class="tile is-child is-warning notification">
-                  <p class="title has-text-centered is-size-6-mobile">{sc.name}</p>
+                  <p class="has-text-centered is-size-6-mobile">{sc.name}</p>
                 </a>
               {:else}
                 <a on:click={isStudioMode ? setPreview : setScene} class="tile is-child is-info notification">
-                  <p class="title has-text-centered is-size-6-mobile">{sc.name}</p>
+                  <p class="has-text-centered is-size-6-mobile">{sc.name}</p>
                 </a>
               {/if}
             </div>
