@@ -4,7 +4,7 @@
   // Imports
   import { onMount } from 'svelte';
   import './style.scss';
-  import { mdiFullscreen, mdiFullscreenExit, mdiBorderVertical, mdiArrowSplitHorizontal, mdiAccessPoint, mdiAccessPointOff, mdiRecord, mdiStop, mdiPause, mdiPlayPause } from '@mdi/js';
+  import { mdiFullscreen, mdiFullscreenExit, mdiBorderVertical, mdiArrowSplitHorizontal, mdiEarth, mdiAccessPoint, mdiAccessPointOff, mdiRecord, mdiStop, mdiPause, mdiPlayPause } from '@mdi/js';
   import Icon from 'mdi-svelte';
   import compareVersions from 'compare-versions';
 
@@ -84,6 +84,16 @@
     .map((_, index) => index * 4)
     .map(begin => scenes.slice(begin, begin + 4));
 
+  let keys = ["F1","F2","F3","F4","F5","F6"]
+  let nodes = [
+    ["Node1", "obs-node1-pri.kandolab.com:4444"],
+    ["Node2", "obs-node2-pri.kandolab.com:4444"],
+    ["Node3", "obs-node3-pri.kandolab.com:4444"],
+    ["Node4", "obs-node4-pri.kandolab.com:4444"],
+    ["Node5", "obs-node5-pri.kandolab.com:4444"],
+    ["Localhost", "localhost:4444"],
+  ]
+
   function toggleFullScreen() {
     if (isFullScreen) {
       if (document.exitFullscreen) {
@@ -124,6 +134,10 @@
 
   async function setScene(e) {
     await sendCommand('SetCurrentScene', { 'scene-name': e.currentTarget.textContent });
+  }
+
+  async function setHotKey(e) {
+    await sendCommand('TriggerHotkeyBySequence', { 'keyId': "OBS_KEY_"+ e.currentTarget.textContent });
   }
 
   async function transitionScene(e) {
@@ -296,14 +310,14 @@
 </script>
 
 <svelte:head>
-  <title>OBS-web - control OBS from anywhere</title>
+  <title>KandoLab Contoller</title>
 </svelte:head>
 
 <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
     <a class="navbar-item is-size-4 has-text-weight-bold" href="/">
       <img src="favicon.png" alt="OBS-web" class="rotate" />
-      &nbsp; OBS-web
+      &nbsp; KandoLab Controller
     </a>
 
     <!-- svelte-ignore a11y-missing-attribute -->
@@ -414,6 +428,16 @@
       {#if isSceneOnTop}
         <SceneView isStudioMode={isStudioMode} transitionScene={transitionScene}/>
       {/if}
+
+      <div class="columns is-mobile">
+        {#each keys as k}
+        <div class="column">
+          <a on:click={setHotKey} class="button is-dark is-fullwidth">
+            <p class="has-text-centered">{k}</p>
+          </a>
+        </div>
+        {/each}
+      </div>
       {#each sceneChunks as chunk}
         <div class="tile is-ancestor">
           {#each chunk as sc}
@@ -441,11 +465,7 @@
       {/if}
     {:else}
       <h1 class="subtitle">
-        Welcome to
-        <strong>OBS-web</strong>
-        - the easiest way to control
-        <a href="https://obsproject.com/" target="_blank">OBS</a>
-        remotely!
+        KandoLab Controller Center
       </h1>
 
       {#if document.location.protocol === 'https:'}
@@ -466,16 +486,27 @@
         </div>
       {/if}
 
-      <p>To get started, enter your OBS host below and click "connect".</p>
+      <p>Select your instance to connect</p>
 
       <div class="field is-grouped">
+        <div class="control has-icons-left">
+          <div class="select">
+            <select bind:value={host}>
+              {#each nodes as n}
+              <option value={n[1]}>{n[0]}</option>
+              {/each}
+            </select>
+          </div>
+          <span class="icon is-left">
+            <Icon path={mdiEarth} />
+          </span>
+        </div>
         <p class="control is-expanded">
           <input id="host" on:keyup={hostkey} bind:value={host} class="input" type="text" placeholder="localhost:4444" />
         </p>
         <p class="control">
           <button on:click={connect} class="button is-success">Connect</button>
         </p>
-
       </div>
       <p class="help">
         Make sure that the
